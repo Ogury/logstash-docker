@@ -12,8 +12,8 @@ else
   VERSION_TAG := $(ELASTIC_VERSION)
 endif
 
-IMAGE_FLAVORS ?= oss full
-DEFAULT_IMAGE_FLAVOR ?= full
+IMAGE_FLAVORS ?= oss
+DEFAULT_IMAGE_FLAVOR ?= oss
 
 IMAGE_TAG := $(ELASTIC_REGISTRY)/logstash/logstash
 HTTPD ?= logstash-docker-artifact-server
@@ -37,7 +37,7 @@ lint: venv
 build: dockerfile docker-compose env2yaml
 	docker pull centos:7
 	$(foreach FLAVOR, $(IMAGE_FLAVORS), \
-	  docker build -t $(IMAGE_TAG)-$(FLAVOR):$(VERSION_TAG) \
+	  docker build --network host -t $(IMAGE_TAG)-$(FLAVOR):$(VERSION_TAG) \
 	  -f build/logstash/Dockerfile-$(FLAVOR) build/logstash; \
 	  if [[ $(FLAVOR) == $(DEFAULT_IMAGE_FLAVOR) ]]; then \
 	    docker tag $(IMAGE_TAG)-$(FLAVOR):$(VERSION_TAG) $(IMAGE_TAG):$(VERSION_TAG); \
@@ -110,7 +110,7 @@ venv: requirements.txt
 
 # Make a Golang container that can compile our env2yaml tool.
 golang:
-	docker build -t golang:env2yaml build/golang
+	docker build --network host -t golang:env2yaml build/golang
 
 # Compile "env2yaml", the helper for configuring logstash.yml via environment
 # variables.

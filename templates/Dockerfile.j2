@@ -58,7 +58,9 @@ ADD bin/docker-entrypoint /usr/local/bin/
 RUN chmod 0755 /usr/local/bin/docker-entrypoint
 
 USER 1000
+RUN cd /usr/share/logstash && logstash-plugin install logstash-output-gelf &&  logstash-plugin install logstash-filter-json_encode
 
+USER logstash
 ADD env2yaml/env2yaml /usr/local/bin/
 
 EXPOSE 9600 5044
